@@ -1,0 +1,66 @@
+openapi: 3.1.0
+info:
+  title: Price Comparator API
+  version: "1.0"
+servers:
+  - url: https://TU-PROYECTO.vercel.app
+paths:
+  /api/compare-prices:
+    get:
+      operationId: comparePrices
+      summary: Busca precios comparables por marca+modelo en MX/US/CO
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: query
+          name: brand
+          required: true
+          schema: { type: string }
+        - in: query
+          name: model
+          required: true
+          schema: { type: string }
+        - in: query
+          name: countries
+          description: Lista de países (MX,US,CO). Por defecto: todos.
+          required: false
+          schema:
+            type: string
+            example: "MX,US,CO"
+        - in: query
+          name: gtin
+          required: false
+          schema: { type: string, description: "UPC/EAN si lo tienes" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  query: { type: string }
+                  ts: { type: string, format: date-time }
+                  base_currency: { type: string }
+                  offers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        country: { type: string }
+                        marketplace: { type: string }
+                        title: { type: string }
+                        url: { type: string, format: uri }
+                        seller: { type: string }
+                        price: { type: number }
+                        currency: { type: string }
+                        price_usd: { type: number }
+                  summary:
+                    type: object
+                    additionalProperties: true
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
